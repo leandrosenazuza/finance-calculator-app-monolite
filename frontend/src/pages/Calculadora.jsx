@@ -233,11 +233,25 @@ export default function Calculadora() {
             <p><strong>Débito:</strong> {Number(resultado.debito).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</p>
             <p><strong>Crédito à vista:</strong> {Number(resultado.creditoAVista).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</p>
             <h5 style={{ marginTop: 10 }}>Parcelas:</h5>
-            <ul style={{ paddingLeft: 20 }}>
-              {resultado.parcelas.map((p, i) => (
-                <li key={i} style={{ textDecoration: "underline" }}>{p.qtd}x de R$ {Number(p.valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</li>
-              ))}
-            </ul>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+  <thead>
+    <tr>
+      <th style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'left' }}>Quantidade</th>
+      <th style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'left' }}>Valor</th>
+    </tr>
+  </thead>
+  <tbody>
+    {resultado.parcelas.map((p, i) => (
+      <tr key={i}>
+        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{p.qtd}x</td>
+        <td style={{ border: '1px solid #ddd', padding: '8px' }}>
+          {Number(p.valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
             <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
               <button onClick={voltar} style={{
                 flex: 1,
