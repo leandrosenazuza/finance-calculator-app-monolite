@@ -90,7 +90,8 @@ export default function Calculadora() {
       background: "linear-gradient(to bottom, #1e3c72, #2a5298)",
       color: "#fff",
       padding: "30px 15px",
-      fontFamily: "Arial, sans-serif"
+      fontFamily: "Arial, sans-serif",
+      fontSize: "2.75em"
     }}>
       <div style={{
         display: "flex",
@@ -111,14 +112,15 @@ export default function Calculadora() {
           borderRadius: 8,
           color: "#fff",
           fontWeight: "bold",
-          cursor: "pointer"
+          cursor: "pointer",
+          fontSize: "1em"
         }}>
           Sair
         </button>
       </div>
 
       <div style={{
-        maxWidth: 400,
+        maxWidth: "100vw",
         margin: "0 auto",
         background: "#ffffff22",
         padding: 20,
@@ -135,6 +137,7 @@ export default function Calculadora() {
                   flex: 1,
                   padding: "10px 0",
                   fontWeight: "bold",
+                  fontSize: "1em",
                   background: selectedTipo === "visa_master" ? "#007bff" : "#ffffff44",
                   color: "#fff",
                   border: `2px solid ${selectedTipo === "visa_master" ? "#007bff" : "#fff"}`,
@@ -150,6 +153,7 @@ export default function Calculadora() {
                   flex: 1,
                   padding: "10px 0",
                   fontWeight: "bold",
+                  fontSize: "1em",
                   background: selectedTipo === "elo" ? "#28a745" : "#ffffff44",
                   color: "#fff",
                   border: `2px solid ${selectedTipo === "elo" ? "#28a745" : "#fff"}`,
@@ -164,7 +168,8 @@ export default function Calculadora() {
             <div style={{
               fontSize: "1.4rem",
               marginBottom: 20,
-              textAlign: "center"
+              textAlign: "center",
+              fontSize: "1em"
             }}>
               Valor: <strong>R$ {valorFormatado}</strong>
             </div>
@@ -173,7 +178,8 @@ export default function Calculadora() {
               display: "grid",
               gridTemplateColumns: "repeat(3, 1fr)",
               gap: 8,
-              marginBottom: 20
+              marginBottom: 20,
+          
             }}>
               {["1", "2", "3", "4", "5", "6", "7", "8", "9", ",", "0", "←"].map((char, idx) => (
                 <button key={idx} onClick={() => {
@@ -186,6 +192,7 @@ export default function Calculadora() {
                   background: "#fff",
                   color: "#333",
                   fontWeight: "bold",
+                      fontSize: "2em",
                   border: "none",
                   borderRadius: 8,
                   cursor: "pointer"
@@ -204,7 +211,8 @@ export default function Calculadora() {
                 fontWeight: "bold",
                 borderRadius: 10,
                 border: "none",
-                cursor: "pointer"
+                cursor: "pointer",
+                    fontSize: "1.75em"
               }}>
                 Limpar
               </button>
@@ -216,7 +224,8 @@ export default function Calculadora() {
                 fontWeight: "bold",
                 borderRadius: 10,
                 border: "none",
-                cursor: "pointer"
+                cursor: "pointer",
+                    fontSize: "1.75em"
               }}>
                 Calcular
               </button>
@@ -256,6 +265,7 @@ export default function Calculadora() {
               <button onClick={voltar} style={{
                 flex: 1,
                 padding: "10px 0",
+                fontSize: "1.75em",
                 background: "#6c757d",
                 color: "#fff",
                 borderRadius: 8,
@@ -271,7 +281,8 @@ export default function Calculadora() {
                 borderRadius: 8,
                 border: "none",
                 fontWeight: "bold",
-                cursor: "pointer"
+                cursor: "pointer",
+                fontSize: "1.75em"
               }}>Imprimir</button>
             </div>
           </div>
