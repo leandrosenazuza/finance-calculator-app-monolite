@@ -38,6 +38,8 @@ export default function Login({ setUser }) {
   return (
     <div style={{
       height: "100vh",
+      width: "100vw",
+      fontSize:"1.25em", 
       background: "linear-gradient(to bottom, #1e3c72, #2a5298)",
       display: "flex", justifyContent: "center", alignItems: "center"
     }}>
@@ -46,24 +48,26 @@ export default function Login({ setUser }) {
           e.preventDefault();
           handleLogin();
         }}
-        style={{ background: "#ffffff22", padding: 40, borderRadius: 12, textAlign: "center" }}
+        style={{ background: "#ffffff22", padding: 40, borderRadius: 12, textAlign: "center",    fontSize:"1.5em" }}
       >
         <h1 style={{ color: "#fff", marginBottom: 20 }}>Login</h1>
         <input
           type="text"
+             fontSize="1.25em"
           placeholder="Usuário"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          style={{ padding: 10, borderRadius: 8, border: "none", marginBottom: 10, width: 200 }}
+          style={{ padding: 10, borderRadius: 8, border: "none", marginBottom: 10, width: 200 ,  fontSize:"1.5em",  }}
         /><br />
         <input
           type="password"
+          fontSize="1.5em"
           placeholder="Senha"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          style={{ padding: 10, borderRadius: 8, border: "none", marginBottom: 10, width: 200 }}
+          style={{ padding: 10, borderRadius: 8, border: "none", marginBottom: 10, width: 200,    fontSize:"1.5em",  }}
         /><br />
-        <button type="submit" style={{ padding: "10px 20px", borderRadius: 8, background: "#007bff", color: "#fff", border: "none" }}>
+        <button type="submit" style={{ padding: "10px 20px", borderRadius: 8, background: "#007bff", color: "#fff", border: "none", fontSize:"1.5em" }}>
           Entrar
         </button>
         {error && <p style={{ color: "yellow", marginTop: 10 }}>{error}</p>}

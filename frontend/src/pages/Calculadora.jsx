@@ -188,7 +188,7 @@ export default function Calculadora() {
                   addDigit(char);
                 }} style={{
                   padding: "12px 0",
-                  fontSize: "1.2rem",
+                  fontSize: "0.75rem",
                   background: "#fff",
                   color: "#333",
                   fontWeight: "bold",
@@ -265,7 +265,7 @@ export default function Calculadora() {
               <button onClick={voltar} style={{
                 flex: 1,
                 padding: "10px 0",
-                fontSize: "1.75em",
+                fontSize: "2em",
                 background: "#6c757d",
                 color: "#fff",
                 borderRadius: 8,
