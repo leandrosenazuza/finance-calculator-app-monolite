@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import Sidebar from "../../../components/admin/Sidebar";
 
 export default function GerenciarUsuarios() {
   const [usuarios, setUsuarios] = useState([]);
@@ -10,6 +10,7 @@ export default function GerenciarUsuarios() {
   const [tabela, setTabela] = useState("");
   const [tabelasDisponiveis, setTabelasDisponiveis] = useState([]);
   const [mensagem, setMensagem] = useState("");
+  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
     buscarUsuarios();
@@ -41,7 +42,8 @@ export default function GerenciarUsuarios() {
 
   const handleCriar = async () => {
     if (!nome || !senha || !type || !tabela) {
-      alert("Preencha todos os campos.");
+      setMensagem("⚠️ Preencha todos os campos.");
+      setTimeout(() => setMensagem(""), 3000);
       return;
     }
     const login = gerarLogin(nome);
@@ -53,15 +55,18 @@ export default function GerenciarUsuarios() {
         type,
         tabela
       });
-      setMensagem("Usuário criado com sucesso!");
+      setMensagem("✅ Usuário criado com sucesso!");
       setNome("");
       setSenha("");
       setType("comum");
       setTabela("");
+      setShowForm(false);
       buscarUsuarios();
+      setTimeout(() => setMensagem(""), 3000);
     } catch (err) {
       console.error("Erro ao criar usuário:", err);
-      alert("Erro ao criar usuário.");
+      setMensagem("❌ Erro ao criar usuário.");
+      setTimeout(() => setMensagem(""), 3000);
     }
   };
 
@@ -77,127 +82,464 @@ export default function GerenciarUsuarios() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", fontFamily: "Arial, sans-serif" }}>
-      <div style={{
-        width: 240,
-        background: "#1e3c72",
-        color: "#fff",
-        padding: 20,
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between"
-      }}>
-        <div>
-          <h2 style={{ marginBottom: 30, fontSize: 24 }}>Admin</h2>
-          <nav style={{ display: "flex", flexDirection: "column", gap: 15 }}>
-            <Link to="/admin/usuarios" style={linkStyle}>👤 Usuários</Link>
-            <Link to="/admin/tabelas" style={linkStyle}>📁 Tabelas</Link>
-            <Link to="/admin/relatorios" style={linkStyle}>📊 Relatórios</Link>
-          </nav>
-        </div>
-        <button
-          onClick={() => {
-            localStorage.removeItem("user");
-            window.location.href = "/login";
-          }}
-          style={{
-            marginTop: 30,
-            padding: "10px",
-            backgroundColor: "#ff4d4f",
-            color: "#fff",
-            border: "none",
-            borderRadius: 6,
-            cursor: "pointer"
-          }}
-        >
-          🚪 Sair
-        </button>
-      </div>
+    <div style={{
+      display: "flex",
+      minHeight: "100vh",
+      fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
+      background: "#f5f7fa"
+    }}>
+      <Sidebar />
 
-      <div style={{ flex: 1, padding: 40 }}>
-        <h2>Gerenciar Usuários</h2>
-
-        <div style={{ marginBottom: 30, marginTop: 20 }}>
-          <input placeholder="Nome completo" value={nome} onChange={(e) => setNome(e.target.value)} style={inputStyle} />
-          <input placeholder="Senha" type="password" value={senha} onChange={(e) => setSenha(e.target.value)} style={inputStyle} />
-          <select value={type} onChange={(e) => setType(e.target.value)} style={inputStyle}>
-            <option value="comum">Usuário Comum</option>
-            <option value="admin">Administrador</option>
-          </select>
-          <select value={tabela} onChange={(e) => setTabela(e.target.value)} style={inputStyle}>
-            <option value="">Selecione uma Tabela</option>
-            {tabelasDisponiveis.map((t, i) => (
-              <option key={i} value={t}>{t}</option>
-            ))}
-          </select>
-          <button onClick={handleCriar} style={buttonStyle}>Criar Usuário</button>
-          {mensagem && <p style={{ color: "green", marginTop: 10 }}>{mensagem}</p>}
+      <div style={{ flex: 1, padding: "40px", overflowY: "auto" }}>
+        <div style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 32
+        }}>
+          <div>
+            <h1 style={{
+              fontSize: "32px",
+              fontWeight: "bold",
+              margin: "0 0 8px 0",
+              color: "#1e293b"
+            }}>
+              Gerenciar Usuários
+            </h1>
+            <p style={{
+              color: "#64748b",
+              margin: 0,
+              fontSize: "16px"
+            }}>
+              Crie e gerencie usuários do sistema
+            </p>
+          </div>
+          <button
+            onClick={() => setShowForm(!showForm)}
+            style={{
+              padding: "12px 24px",
+              background: showForm
+                ? "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"
+                : "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              color: "#fff",
+              border: "none",
+              borderRadius: "12px",
+              fontSize: "16px",
+              fontWeight: "600",
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              boxShadow: "0 4px 12px rgba(102,126,234,0.3)"
+            }}
+          >
+            {showForm ? "✕ Cancelar" : "+ Novo Usuário"}
+          </button>
         </div>
 
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr style={{ background: "#eee" }}>
-              <th style={thStyle}>Nome</th>
-              <th style={thStyle}>Usuário</th>
-              <th style={thStyle}>Tipo</th>
-              <th style={thStyle}>Tabela</th>
-              <th style={thStyle}></th>
-            </tr>
-          </thead>
-          <tbody>
-            {usuarios.map((u) => (
-              <tr key={u.id}>
-                <td style={tdStyle}>{u.name}</td>
-                <td style={tdStyle}>{u.username}</td>
-                <td style={tdStyle}>{u.type}</td>
-                <td style={tdStyle}>{u.tabela}</td>
-                <td style={tdStyle}>
-                  <button onClick={() => excluirUsuario(u.id)} style={{ background: "red", color: "#fff", border: "none", padding: "4px 10px", borderRadius: 4 }}>
-                    Excluir
-                  </button>
-                </td>
+        {mensagem && (
+          <div style={{
+            padding: "12px 20px",
+            borderRadius: "12px",
+            marginBottom: 24,
+            background: mensagem.includes("✅")
+              ? "rgba(16,185,129,0.1)"
+              : mensagem.includes("❌")
+              ? "rgba(239,68,68,0.1)"
+              : "rgba(251,191,36,0.1)",
+            color: mensagem.includes("✅")
+              ? "#10b981"
+              : mensagem.includes("❌")
+              ? "#ef4444"
+              : "#f59e0b",
+            border: `1px solid ${
+              mensagem.includes("✅")
+                ? "rgba(16,185,129,0.3)"
+                : mensagem.includes("❌")
+                ? "rgba(239,68,68,0.3)"
+                : "rgba(251,191,36,0.3)"
+            }`
+          }}>
+            {mensagem}
+          </div>
+        )}
+
+        {showForm && (
+          <div style={{
+            background: "#fff",
+            borderRadius: "16px",
+            padding: "32px",
+            marginBottom: 32,
+            boxShadow: "0 4px 6px rgba(0,0,0,0.07)",
+            border: "1px solid #e2e8f0"
+          }}>
+            <h2 style={{
+              fontSize: "20px",
+              fontWeight: "600",
+              margin: "0 0 24px 0",
+              color: "#1e293b"
+            }}>
+              Criar Novo Usuário
+            </h2>
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+              gap: 20
+            }}>
+              <div>
+                <label style={{
+                  display: "block",
+                  marginBottom: 8,
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  color: "#475569"
+                }}>
+                  Nome Completo
+                </label>
+                <input
+                  placeholder="Digite o nome completo"
+                  value={nome}
+                  onChange={(e) => setNome(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "12px 16px",
+                    borderRadius: "10px",
+                    border: "1px solid #e2e8f0",
+                    fontSize: "15px",
+                    transition: "all 0.2s ease"
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = "#667eea";
+                    e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102,126,234,0.1)";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = "#e2e8f0";
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                />
+              </div>
+              <div>
+                <label style={{
+                  display: "block",
+                  marginBottom: 8,
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  color: "#475569"
+                }}>
+                  Senha
+                </label>
+                <input
+                  placeholder="Digite a senha"
+                  type="password"
+                  value={senha}
+                  onChange={(e) => setSenha(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "12px 16px",
+                    borderRadius: "10px",
+                    border: "1px solid #e2e8f0",
+                    fontSize: "15px",
+                    transition: "all 0.2s ease"
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = "#667eea";
+                    e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102,126,234,0.1)";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = "#e2e8f0";
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                />
+              </div>
+              <div>
+                <label style={{
+                  display: "block",
+                  marginBottom: 8,
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  color: "#475569"
+                }}>
+                  Tipo de Usuário
+                </label>
+                <select
+                  value={type}
+                  onChange={(e) => setType(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "12px 16px",
+                    borderRadius: "10px",
+                    border: "1px solid #e2e8f0",
+                    fontSize: "15px",
+                    background: "#fff",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease"
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = "#667eea";
+                    e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102,126,234,0.1)";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = "#e2e8f0";
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                >
+                  <option value="comum">Usuário Comum</option>
+                  <option value="admin">Administrador</option>
+                </select>
+              </div>
+              <div>
+                <label style={{
+                  display: "block",
+                  marginBottom: 8,
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  color: "#475569"
+                }}>
+                  Tabela
+                </label>
+                <select
+                  value={tabela}
+                  onChange={(e) => setTabela(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "12px 16px",
+                    borderRadius: "10px",
+                    border: "1px solid #e2e8f0",
+                    fontSize: "15px",
+                    background: "#fff",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease"
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = "#667eea";
+                    e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102,126,234,0.1)";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = "#e2e8f0";
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                >
+                  <option value="">Selecione uma Tabela</option>
+                  {tabelasDisponiveis.map((t, i) => (
+                    <option key={i} value={t}>{t}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <button
+              onClick={handleCriar}
+              style={{
+                marginTop: 24,
+                padding: "14px 28px",
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                color: "#fff",
+                border: "none",
+                borderRadius: "10px",
+                fontSize: "16px",
+                fontWeight: "600",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                boxShadow: "0 4px 12px rgba(102,126,234,0.3)"
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-2px)";
+                e.currentTarget.style.boxShadow = "0 6px 16px rgba(102,126,234,0.4)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "0 4px 12px rgba(102,126,234,0.3)";
+              }}
+            >
+              ✨ Criar Usuário
+            </button>
+          </div>
+        )}
+
+        <div style={{
+          background: "#fff",
+          borderRadius: "16px",
+          padding: "24px",
+          boxShadow: "0 4px 6px rgba(0,0,0,0.07)",
+          border: "1px solid #e2e8f0",
+          overflowX: "auto"
+        }}>
+          <table style={{
+            width: "100%",
+            borderCollapse: "separate",
+            borderSpacing: 0
+          }}>
+            <thead>
+              <tr>
+                <th style={{
+                  textAlign: "left",
+                  padding: "16px",
+                  background: "#f8fafc",
+                  borderBottom: "2px solid #e2e8f0",
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  color: "#475569",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.5px"
+                }}>
+                  Nome
+                </th>
+                <th style={{
+                  textAlign: "left",
+                  padding: "16px",
+                  background: "#f8fafc",
+                  borderBottom: "2px solid #e2e8f0",
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  color: "#475569",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.5px"
+                }}>
+                  Usuário
+                </th>
+                <th style={{
+                  textAlign: "left",
+                  padding: "16px",
+                  background: "#f8fafc",
+                  borderBottom: "2px solid #e2e8f0",
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  color: "#475569",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.5px"
+                }}>
+                  Tipo
+                </th>
+                <th style={{
+                  textAlign: "left",
+                  padding: "16px",
+                  background: "#f8fafc",
+                  borderBottom: "2px solid #e2e8f0",
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  color: "#475569",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.5px"
+                }}>
+                  Tabela
+                </th>
+                <th style={{
+                  textAlign: "center",
+                  padding: "16px",
+                  background: "#f8fafc",
+                  borderBottom: "2px solid #e2e8f0",
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  color: "#475569",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.5px"
+                }}>
+                  Ações
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {usuarios.map((u, index) => (
+                <tr
+                  key={u.id}
+                  style={{
+                    transition: "background 0.2s ease"
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "#f8fafc";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "transparent";
+                  }}
+                >
+                  <td style={{
+                    padding: "16px",
+                    borderBottom: "1px solid #f1f5f9",
+                    fontSize: "15px",
+                    color: "#1e293b"
+                  }}>
+                    {u.name}
+                  </td>
+                  <td style={{
+                    padding: "16px",
+                    borderBottom: "1px solid #f1f5f9",
+                    fontSize: "15px",
+                    color: "#64748b",
+                    fontFamily: "monospace"
+                  }}>
+                    {u.username}
+                  </td>
+                  <td style={{
+                    padding: "16px",
+                    borderBottom: "1px solid #f1f5f9"
+                  }}>
+                    <span style={{
+                      padding: "6px 12px",
+                      borderRadius: "20px",
+                      fontSize: "12px",
+                      fontWeight: "600",
+                      background: u.type === "admin"
+                        ? "rgba(102,126,234,0.1)"
+                        : "rgba(16,185,129,0.1)",
+                      color: u.type === "admin"
+                        ? "#667eea"
+                        : "#10b981"
+                    }}>
+                      {u.type === "admin" ? "👑 Admin" : "👤 Comum"}
+                    </span>
+                  </td>
+                  <td style={{
+                    padding: "16px",
+                    borderBottom: "1px solid #f1f5f9",
+                    fontSize: "15px",
+                    color: "#64748b"
+                  }}>
+                    {u.tabela || "-"}
+                  </td>
+                  <td style={{
+                    padding: "16px",
+                    borderBottom: "1px solid #f1f5f9",
+                    textAlign: "center"
+                  }}>
+                    <button
+                      onClick={() => excluirUsuario(u.id)}
+                      style={{
+                        background: "rgba(239,68,68,0.1)",
+                        color: "#ef4444",
+                        border: "1px solid rgba(239,68,68,0.2)",
+                        padding: "8px 16px",
+                        borderRadius: "8px",
+                        fontSize: "14px",
+                        fontWeight: "600",
+                        cursor: "pointer",
+                        transition: "all 0.2s ease"
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = "#ef4444";
+                        e.currentTarget.style.color = "#fff";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = "rgba(239,68,68,0.1)";
+                        e.currentTarget.style.color = "#ef4444";
+                      }}
+                    >
+                      🗑️ Excluir
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {usuarios.length === 0 && (
+            <div style={{
+              padding: "60px 20px",
+              textAlign: "center",
+              color: "#94a3b8"
+            }}>
+              <p style={{ fontSize: "18px", margin: 0 }}>
+                Nenhum usuário cadastrado ainda
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
 }
-
-const linkStyle = {
-  color: "#fff",
-  textDecoration: "none",
-  fontSize: 18,
-  padding: "8px 12px",
-  borderRadius: 4,
-  background: "#2a5298"
-};
-
-const inputStyle = {
-  marginRight: 10,
-  padding: 8,
-  borderRadius: 4,
-  border: "1px solid #ccc",
-  marginBottom: 10
-};
-
-const buttonStyle = {
-  padding: "8px 16px",
-  background: "#007bff",
-  color: "#fff",
-  border: "none",
-  borderRadius: 4,
-  cursor: "pointer"
-};
-
-const thStyle = {
-  textAlign: "left",
-  padding: 8,
-  borderBottom: "1px solid #ccc"
-};
-
-const tdStyle = {
-  padding: 8,
-  borderBottom: "1px solid #eee"
-};
