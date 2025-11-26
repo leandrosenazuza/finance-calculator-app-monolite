@@ -11,6 +11,11 @@ export default function GerenciarUsuarios() {
   const [tabelasDisponiveis, setTabelasDisponiveis] = useState([]);
   const [mensagem, setMensagem] = useState("");
   const [showForm, setShowForm] = useState(false);
+  const [usuarioEditando, setUsuarioEditando] = useState(null);
+  const [editNome, setEditNome] = useState("");
+  const [editSenha, setEditSenha] = useState("");
+  const [editType, setEditType] = useState("comum");
+  const [editTabela, setEditTabela] = useState("");
 
   useEffect(() => {
     buscarUsuarios();
@@ -66,6 +71,56 @@ export default function GerenciarUsuarios() {
     } catch (err) {
       console.error("Erro ao criar usuário:", err);
       setMensagem("❌ Erro ao criar usuário.");
+      setTimeout(() => setMensagem(""), 3000);
+    }
+  };
+
+  const iniciarEdicao = (usuario) => {
+    setUsuarioEditando(usuario);
+    setEditNome(usuario.name);
+    setEditSenha("");
+    setEditType(usuario.type);
+    setEditTabela(usuario.tabela || "");
+    setShowForm(false);
+  };
+
+  const cancelarEdicao = () => {
+    setUsuarioEditando(null);
+    setEditNome("");
+    setEditSenha("");
+    setEditType("comum");
+    setEditTabela("");
+  };
+
+  const handleAtualizar = async () => {
+    if (!editNome || !editType || !editTabela) {
+      setMensagem("⚠️ Preencha todos os campos obrigatórios.");
+      setTimeout(() => setMensagem(""), 3000);
+      return;
+    }
+    
+    const login = gerarLogin(editNome);
+    try {
+      const dadosAtualizacao = {
+        name: editNome,
+        username: login,
+        type: editType,
+        tabela: editTabela
+      };
+      
+      // Só inclui senha se foi preenchida
+      if (editSenha) {
+        dadosAtualizacao.password = editSenha;
+      }
+      
+      await axios.put(`/api/users/${usuarioEditando.id}`, dadosAtualizacao);
+      setMensagem("✅ Usuário atualizado com sucesso!");
+      cancelarEdicao();
+      buscarUsuarios();
+      setTimeout(() => setMensagem(""), 3000);
+    } catch (err) {
+      console.error("Erro ao atualizar usuário:", err);
+      setMensagem("❌ Erro ao atualizar usuário.");
       setTimeout(() => setMensagem(""), 3000);
     }
   };
@@ -353,6 +408,226 @@ export default function GerenciarUsuarios() {
           </div>
         )}
 
+        {usuarioEditando && (
+          <div style={{
+            background: "#fff",
+            borderRadius: "16px",
+            padding: "32px",
+            marginBottom: 32,
+            boxShadow: "0 4px 6px rgba(0,0,0,0.07)",
+            border: "1px solid #e2e8f0"
+          }}>
+            <div style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 24
+            }}>
+              <h2 style={{
+                fontSize: "20px",
+                fontWeight: "600",
+                margin: 0,
+                color: "#1e293b"
+              }}>
+                Editar Usuário: {usuarioEditando.name}
+              </h2>
+              <button
+                onClick={cancelarEdicao}
+                style={{
+                  padding: "8px 16px",
+                  background: "#f1f5f9",
+                  color: "#64748b",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "8px",
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease"
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "#e2e8f0";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "#f1f5f9";
+                }}
+              >
+                ✕ Cancelar
+              </button>
+            </div>
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+              gap: 20
+            }}>
+              <div>
+                <label style={{
+                  display: "block",
+                  marginBottom: 8,
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  color: "#475569"
+                }}>
+                  Nome Completo
+                </label>
+                <input
+                  placeholder="Digite o nome completo"
+                  value={editNome}
+                  onChange={(e) => setEditNome(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "12px 16px",
+                    borderRadius: "10px",
+                    border: "1px solid #e2e8f0",
+                    fontSize: "15px",
+                    transition: "all 0.2s ease"
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = "#667eea";
+                    e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102,126,234,0.1)";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = "#e2e8f0";
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                />
+              </div>
+              <div>
+                <label style={{
+                  display: "block",
+                  marginBottom: 8,
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  color: "#475569"
+                }}>
+                  Nova Senha (opcional)
+                </label>
+                <input
+                  placeholder="Deixe em branco para manter a senha atual"
+                  type="password"
+                  value={editSenha}
+                  onChange={(e) => setEditSenha(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "12px 16px",
+                    borderRadius: "10px",
+                    border: "1px solid #e2e8f0",
+                    fontSize: "15px",
+                    transition: "all 0.2s ease"
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = "#667eea";
+                    e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102,126,234,0.1)";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = "#e2e8f0";
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                />
+              </div>
+              <div>
+                <label style={{
+                  display: "block",
+                  marginBottom: 8,
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  color: "#475569"
+                }}>
+                  Tipo de Usuário
+                </label>
+                <select
+                  value={editType}
+                  onChange={(e) => setEditType(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "12px 16px",
+                    borderRadius: "10px",
+                    border: "1px solid #e2e8f0",
+                    fontSize: "15px",
+                    background: "#fff",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease"
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = "#667eea";
+                    e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102,126,234,0.1)";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = "#e2e8f0";
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                >
+                  <option value="comum">Usuário Comum</option>
+                  <option value="admin">Administrador</option>
+                </select>
+              </div>
+              <div>
+                <label style={{
+                  display: "block",
+                  marginBottom: 8,
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  color: "#475569"
+                }}>
+                  Tabela
+                </label>
+                <select
+                  value={editTabela}
+                  onChange={(e) => setEditTabela(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "12px 16px",
+                    borderRadius: "10px",
+                    border: "1px solid #e2e8f0",
+                    fontSize: "15px",
+                    background: "#fff",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease"
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = "#667eea";
+                    e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102,126,234,0.1)";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = "#e2e8f0";
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                >
+                  <option value="">Selecione uma Tabela</option>
+                  {tabelasDisponiveis.map((t, i) => (
+                    <option key={i} value={t}>{t}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <button
+              onClick={handleAtualizar}
+              style={{
+                marginTop: 24,
+                padding: "14px 28px",
+                background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                color: "#fff",
+                border: "none",
+                borderRadius: "10px",
+                fontSize: "16px",
+                fontWeight: "600",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                boxShadow: "0 4px 12px rgba(16,185,129,0.3)"
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-2px)";
+                e.currentTarget.style.boxShadow = "0 6px 16px rgba(16,185,129,0.4)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "0 4px 12px rgba(16,185,129,0.3)";
+              }}
+            >
+              💾 Salvar Alterações
+            </button>
+          </div>
+        )}
+
         <div style={{
           background: "#fff",
           borderRadius: "16px",
@@ -498,30 +773,61 @@ export default function GerenciarUsuarios() {
                     borderBottom: "1px solid #f1f5f9",
                     textAlign: "center"
                   }}>
-                    <button
-                      onClick={() => excluirUsuario(u.id)}
-                      style={{
-                        background: "rgba(239,68,68,0.1)",
-                        color: "#ef4444",
-                        border: "1px solid rgba(239,68,68,0.2)",
-                        padding: "8px 16px",
-                        borderRadius: "8px",
-                        fontSize: "14px",
-                        fontWeight: "600",
-                        cursor: "pointer",
-                        transition: "all 0.2s ease"
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = "#ef4444";
-                        e.currentTarget.style.color = "#fff";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = "rgba(239,68,68,0.1)";
-                        e.currentTarget.style.color = "#ef4444";
-                      }}
-                    >
-                      🗑️ Excluir
-                    </button>
+                    <div style={{
+                      display: "flex",
+                      gap: 8,
+                      justifyContent: "center",
+                      flexWrap: "wrap"
+                    }}>
+                      <button
+                        onClick={() => iniciarEdicao(u)}
+                        style={{
+                          background: "rgba(102,126,234,0.1)",
+                          color: "#667eea",
+                          border: "1px solid rgba(102,126,234,0.2)",
+                          padding: "8px 16px",
+                          borderRadius: "8px",
+                          fontSize: "14px",
+                          fontWeight: "600",
+                          cursor: "pointer",
+                          transition: "all 0.2s ease"
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = "#667eea";
+                          e.currentTarget.style.color = "#fff";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = "rgba(102,126,234,0.1)";
+                          e.currentTarget.style.color = "#667eea";
+                        }}
+                      >
+                        ✏️ Editar
+                      </button>
+                      <button
+                        onClick={() => excluirUsuario(u.id)}
+                        style={{
+                          background: "rgba(239,68,68,0.1)",
+                          color: "#ef4444",
+                          border: "1px solid rgba(239,68,68,0.2)",
+                          padding: "8px 16px",
+                          borderRadius: "8px",
+                          fontSize: "14px",
+                          fontWeight: "600",
+                          cursor: "pointer",
+                          transition: "all 0.2s ease"
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = "#ef4444";
+                          e.currentTarget.style.color = "#fff";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = "rgba(239,68,68,0.1)";
+                          e.currentTarget.style.color = "#ef4444";
+                        }}
+                      >
+                        🗑️ Excluir
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
