@@ -22,12 +22,24 @@ router.post('/users', (req, res) => {
   );
 });
 
-// Atualizar tabela do usuário
+// Atualizar tabela e/ou senha do usuário
 router.put('/users/:id', (req, res) => {
-  const { tabela } = req.body;
+  const { tabela, password } = req.body;
   const id = req.params.id;
   
-  db.run('UPDATE users SET tabela = ? WHERE id = ?', [tabela, id], function(err) {
+  let query, params;
+  
+  if (password) {
+    // Se senha foi fornecida, atualiza tabela e senha
+    query = 'UPDATE users SET tabela = ?, password = ? WHERE id = ?';
+    params = [tabela, password, id];
+  } else {
+    // Se senha não foi fornecida, atualiza apenas tabela
+    query = 'UPDATE users SET tabela = ? WHERE id = ?';
+    params = [tabela, id];
+  }
+  
+  db.run(query, params, function(err) {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ success: true, changes: this.changes });
   });

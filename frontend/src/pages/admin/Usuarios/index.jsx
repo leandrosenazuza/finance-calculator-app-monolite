@@ -13,6 +13,7 @@ export default function GerenciarUsuarios() {
   const [showForm, setShowForm] = useState(false);
   const [usuarioEditando, setUsuarioEditando] = useState(null);
   const [editTabela, setEditTabela] = useState("");
+  const [editSenha, setEditSenha] = useState("");
 
   useEffect(() => {
     buscarUsuarios();
@@ -75,12 +76,14 @@ export default function GerenciarUsuarios() {
   const iniciarEdicao = (usuario) => {
     setUsuarioEditando(usuario);
     setEditTabela(usuario.tabela || "");
+    setEditSenha("");
     setShowForm(false);
   };
 
   const cancelarEdicao = () => {
     setUsuarioEditando(null);
     setEditTabela("");
+    setEditSenha("");
   };
 
   const handleAtualizar = async () => {
@@ -91,16 +94,23 @@ export default function GerenciarUsuarios() {
     }
     
     try {
-      await axios.put(`/api/users/${usuarioEditando.id}`, {
+      const dadosAtualizacao = {
         tabela: editTabela
-      });
-      setMensagem("✅ Tabela atualizada com sucesso!");
+      };
+      
+      // Só inclui senha se foi preenchida
+      if (editSenha) {
+        dadosAtualizacao.password = editSenha;
+      }
+      
+      await axios.put(`/api/users/${usuarioEditando.id}`, dadosAtualizacao);
+      setMensagem("✅ Dados atualizados com sucesso!");
       cancelarEdicao();
       buscarUsuarios();
       setTimeout(() => setMensagem(""), 3000);
     } catch (err) {
-      console.error("Erro ao atualizar tabela:", err);
-      setMensagem("❌ Erro ao atualizar tabela.");
+      console.error("Erro ao atualizar:", err);
+      setMensagem("❌ Erro ao atualizar dados.");
       setTimeout(() => setMensagem(""), 3000);
     }
   };
@@ -126,13 +136,13 @@ export default function GerenciarUsuarios() {
       <Sidebar />
 
       <div style={{ flex: 1, padding: "40px", overflowY: "auto", marginLeft: "280px" }}>
-        <div style={{
-          display: "flex",
+      <div style={{
+        display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
           marginBottom: 32
-        }}>
-          <div>
+      }}>
+        <div>
             <h1 style={{
               fontSize: "32px",
               fontWeight: "bold",
@@ -148,16 +158,16 @@ export default function GerenciarUsuarios() {
             }}>
               Crie e gerencie usuários do sistema
             </p>
-          </div>
-          <button
+        </div>
+        <button
             onClick={() => setShowForm(!showForm)}
-            style={{
+          style={{
               padding: "12px 24px",
               background: showForm
                 ? "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"
                 : "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              color: "#fff",
-              border: "none",
+            color: "#fff",
+            border: "none",
               borderRadius: "12px",
               fontSize: "16px",
               fontWeight: "600",
@@ -167,8 +177,8 @@ export default function GerenciarUsuarios() {
             }}
           >
             {showForm ? "✕ Cancelar" : "+ Novo Usuário"}
-          </button>
-        </div>
+        </button>
+      </div>
 
         {mensagem && (
           <div style={{
@@ -316,9 +326,9 @@ export default function GerenciarUsuarios() {
                     e.currentTarget.style.boxShadow = "none";
                   }}
                 >
-                  <option value="comum">Usuário Comum</option>
-                  <option value="admin">Administrador</option>
-                </select>
+            <option value="comum">Usuário Comum</option>
+            <option value="admin">Administrador</option>
+          </select>
               </div>
               <div>
                 <label style={{
@@ -410,7 +420,7 @@ export default function GerenciarUsuarios() {
                   margin: "0 0 4px 0",
                   color: "#1e293b"
                 }}>
-                  Alterar Tabela do Usuário
+                  Editar Usuário
                 </h2>
                 <p style={{
                   fontSize: "14px",
@@ -445,7 +455,7 @@ export default function GerenciarUsuarios() {
             </div>
             <div style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+              gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
               gap: 20
             }}>
               <div>
@@ -510,6 +520,39 @@ export default function GerenciarUsuarios() {
                   ))}
                 </select>
               </div>
+              <div>
+                <label style={{
+                  display: "block",
+                  marginBottom: 8,
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  color: "#475569"
+                }}>
+                  Nova Senha (opcional)
+                </label>
+                <input
+                  placeholder="Deixe em branco para manter a senha atual"
+                  type="password"
+                  value={editSenha}
+                  onChange={(e) => setEditSenha(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "12px 16px",
+                    borderRadius: "10px",
+                    border: "1px solid #e2e8f0",
+                    fontSize: "15px",
+                    transition: "all 0.2s ease"
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = "#667eea";
+                    e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102,126,234,0.1)";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = "#e2e8f0";
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                />
+              </div>
             </div>
             <button
               onClick={handleAtualizar}
@@ -535,9 +578,9 @@ export default function GerenciarUsuarios() {
                 e.currentTarget.style.boxShadow = "0 4px 12px rgba(16,185,129,0.3)";
               }}
             >
-              💾 Atualizar Tabela
+              💾 Salvar Alterações
             </button>
-          </div>
+        </div>
         )}
 
         <div style={{
@@ -553,7 +596,7 @@ export default function GerenciarUsuarios() {
             borderCollapse: "separate",
             borderSpacing: 0
           }}>
-            <thead>
+          <thead>
               <tr>
                 <th style={{
                   textAlign: "left",
@@ -620,9 +663,9 @@ export default function GerenciarUsuarios() {
                 }}>
                   Ações
                 </th>
-              </tr>
-            </thead>
-            <tbody>
+            </tr>
+          </thead>
+          <tbody>
               {usuarios.map((u, index) => (
                 <tr
                   key={u.id}
@@ -738,13 +781,13 @@ export default function GerenciarUsuarios() {
                         }}
                       >
                         🗑️ Excluir
-                      </button>
+                  </button>
                     </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
           {usuarios.length === 0 && (
             <div style={{
               padding: "60px 20px",
