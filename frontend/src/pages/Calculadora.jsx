@@ -116,7 +116,8 @@ export default function Calculadora() {
           borderRadius: 8,
           color: "#fff",
           fontWeight: "bold",
-          cursor: "pointer"
+          cursor: "pointer",
+          marginRight: "20px"
         }}>
           Sair
         </button>
