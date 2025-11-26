@@ -43,13 +43,39 @@ if (isProduction) {
   });
 }
 
-app.listen(PORT, () => {
+// Obter IP local da máquina
+const os = require('os');
+const getLocalIP = () => {
+  const interfaces = os.networkInterfaces();
+  for (const name of Object.keys(interfaces)) {
+    for (const iface of interfaces[name]) {
+      if (iface.family === 'IPv4' && !iface.internal) {
+        return iface.address;
+      }
+    }
+  }
+  return 'localhost';
+};
+
+const HOST = process.env.HOST || '0.0.0.0'; // Aceita conexões de qualquer IP
+const LOCAL_IP = getLocalIP();
+
+app.listen(PORT, HOST, () => {
   console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
+  console.log(`🌐 Acesse localmente: http://${LOCAL_IP}:${PORT}`);
+  
   if (!isProduction) {
     console.log(`📝 Modo: Desenvolvimento`);
     console.log(`🌐 Frontend: http://localhost:5173`);
+    console.log(`🌐 Frontend na rede: http://${LOCAL_IP}:5173`);
   } else {
     console.log(`📝 Modo: Produção`);
     console.log(`🌐 Aplicação completa: http://localhost:${PORT}`);
+    console.log(`🌐 Aplicação na rede: http://${LOCAL_IP}:${PORT}`);
   }
+  
+  console.log(`\n📡 Para compartilhar com amigos:`);
+  console.log(`   1. Certifique-se de que estão na mesma rede Wi-Fi`);
+  console.log(`   2. Compartilhe: http://${LOCAL_IP}:${PORT}`);
+  console.log(`   3. Ou use ngrok para acesso externo: npx ngrok http ${PORT}\n`);
 });

@@ -119,8 +119,25 @@ npm start
 
 O servidor irá servir tanto a API quanto o frontend na mesma porta.
 
+## Compartilhar Localmente
+
+Para permitir que amigos acessem na mesma rede Wi-Fi:
+
+1. Inicie o servidor: `npm run dev`
+2. Anote o IP que aparece no terminal (ex: `http://192.168.1.100:3001`)
+3. Compartilhe esse link com seu amigo
+4. Ambos precisam estar na mesma rede Wi-Fi
+
+Para acesso externo (de qualquer lugar), use ngrok:
+```bash
+npx ngrok http 3001
+```
+
+📖 Veja [COMPARTILHAR.md](./COMPARTILHAR.md) para instruções detalhadas.
+
 ## Notas
 
 - Em desenvolvimento, o frontend usa proxy para `/api` apontando para `http://localhost:3001`
 - Em produção, o Express serve os arquivos estáticos do frontend compilado
 - Todas as rotas não-API servem o `index.html` do React Router em produção
+- O servidor aceita conexões de qualquer IP (0.0.0.0) para permitir acesso na rede local
