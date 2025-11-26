@@ -86,11 +86,15 @@ export default function Calculadora() {
 
   return (
     <div style={{
-      minHeight: "100vh",
+      width: "100%",
+      height: "100vh",
       background: "linear-gradient(to bottom, #1e3c72, #2a5298)",
       color: "#fff",
-      padding: "30px 15px",
-      fontFamily: "Arial, sans-serif"
+      padding: "20px",
+      fontFamily: "Arial, sans-serif",
+      display: "flex",
+      flexDirection: "column",
+      overflow: "hidden"
     }}>
       <div style={{
         display: "flex",
@@ -98,7 +102,8 @@ export default function Calculadora() {
         alignItems: "center",
         marginBottom: 20,
         flexWrap: "wrap",
-        gap: 10
+        gap: 10,
+        flexShrink: 0
       }}>
         <h2 style={{ margin: 0 }}>Olá, {user?.name}</h2>
         <button onClick={() => {
@@ -118,16 +123,30 @@ export default function Calculadora() {
       </div>
 
       <div style={{
-        maxWidth: 400,
+        flex: 1,
+        maxWidth: tela === "resultado" ? "95%" : 500,
+        width: "100%",
         margin: "0 auto",
         background: "#ffffff22",
-        padding: 20,
-        borderRadius: 20
+        padding: tela === "resultado" ? "20px" : 25,
+        borderRadius: 20,
+        backdropFilter: "blur(10px)",
+        boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+        minHeight: 0
       }}>
-        <h3 style={{ textAlign: "center", marginBottom: 15 }}>Calculadora Financeira</h3>
+        <h3 style={{ textAlign: "center", marginBottom: 15, flexShrink: 0 }}>Calculadora Financeira</h3>
 
         {tela === "calculadora" && (
-          <>
+          <div style={{
+            display: "flex",
+            flexDirection: "column",
+            flex: 1,
+            justifyContent: "center",
+            minHeight: 0
+          }}>
             <div style={{ display: "flex", gap: 10, justifyContent: "center", marginBottom: 15 }}>
               <button
                 onClick={() => setSelectedTipo("visa_master")}
@@ -221,44 +240,201 @@ export default function Calculadora() {
                 Calcular
               </button>
             </div>
-          </>
+          </div>
         )}
 
         {tela === "resultado" && resultado && (
           <div style={{
-            animation: "fadeIn 0.5s ease-in-out"
+            animation: "fadeIn 0.5s ease-in-out",
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+            overflow: "hidden"
           }}>
-            <h4>Resultado</h4>
-            <p><strong>Valor a receber:</strong> {Number(valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</p>
-            <p><strong>Débito:</strong> {Number(resultado.debito).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</p>
-            <p><strong>Crédito à vista:</strong> {Number(resultado.creditoAVista).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</p>
-            <h5 style={{ marginTop: 10 }}>Parcelas:</h5>
-            <ul style={{ paddingLeft: 20 }}>
+            <h3 style={{ 
+              textAlign: "center", 
+              marginBottom: 25,
+              fontSize: "1.5rem",
+              fontWeight: "bold",
+              textShadow: "0 2px 4px rgba(0,0,0,0.2)"
+            }}>
+              Resultado do Cálculo
+            </h3>
+
+            {/* Valor Principal */}
+            <div style={{
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              padding: "20px",
+              borderRadius: "15px",
+              marginBottom: "20px",
+              textAlign: "center",
+              boxShadow: "0 4px 15px rgba(0,0,0,0.2)"
+            }}>
+              <div style={{ fontSize: "0.9rem", opacity: 0.9, marginBottom: "8px" }}>
+                Valor a receber
+              </div>
+              <div style={{ fontSize: "2rem", fontWeight: "bold" }}>
+                {Number(valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+              </div>
+            </div>
+
+            {/* Cards de Débito e Crédito */}
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "12px",
+              marginBottom: "25px"
+            }}>
+              <div style={{
+                background: "rgba(255,255,255,0.15)",
+                padding: "15px",
+                borderRadius: "12px",
+                border: "1px solid rgba(255,255,255,0.2)",
+                backdropFilter: "blur(10px)"
+              }}>
+                <div style={{ fontSize: "0.85rem", opacity: 0.9, marginBottom: "6px" }}>
+                  Débito
+                </div>
+                <div style={{ fontSize: "1.3rem", fontWeight: "bold", color: "#4ade80" }}>
+                  {Number(resultado.debito).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                </div>
+              </div>
+              <div style={{
+                background: "rgba(255,255,255,0.15)",
+                padding: "15px",
+                borderRadius: "12px",
+                border: "1px solid rgba(255,255,255,0.2)",
+                backdropFilter: "blur(10px)"
+              }}>
+                <div style={{ fontSize: "0.85rem", opacity: 0.9, marginBottom: "6px" }}>
+                  Crédito à vista
+                </div>
+                <div style={{ fontSize: "1.3rem", fontWeight: "bold", color: "#60a5fa" }}>
+                  {Number(resultado.creditoAVista).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                </div>
+              </div>
+            </div>
+
+            {/* Título das Parcelas */}
+            <div style={{
+              marginBottom: "15px",
+              paddingBottom: "10px",
+              borderBottom: "2px solid rgba(255,255,255,0.3)"
+            }}>
+              <h4 style={{ 
+                margin: 0, 
+                fontSize: "1.2rem",
+                fontWeight: "600"
+              }}>
+                Opções de Parcelamento
+              </h4>
+            </div>
+
+            {/* Grid de Parcelas */}
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+              gap: "10px",
+              flex: 1,
+              overflowY: "auto",
+              padding: "5px 8px",
+              marginBottom: "20px",
+              scrollbarWidth: "thin",
+              scrollbarColor: "rgba(255,255,255,0.3) rgba(255,255,255,0.1)",
+              minHeight: 0
+            }}>
               {resultado.parcelas.map((p, i) => (
-                <li key={i} style={{ textDecoration: "underline" }}>{p.qtd}x de R$ {Number(p.valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</li>
+                <div key={i} style={{
+                  background: "rgba(255,255,255,0.1)",
+                  padding: "14px 12px",
+                  borderRadius: "10px",
+                  border: "1px solid rgba(255,255,255,0.15)",
+                  transition: "all 0.2s ease",
+                  cursor: "default",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  minHeight: "70px"
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.2)";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.1)";
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "none";
+                }}
+                >
+                  <div style={{
+                    fontSize: "0.85rem",
+                    fontWeight: "600",
+                    color: "#fbbf24",
+                    marginBottom: "6px",
+                    opacity: 0.9
+                  }}>
+                    {p.qtd} parcelas
+                  </div>
+                  <div style={{
+                    fontSize: "1.1rem",
+                    fontWeight: "bold",
+                    textAlign: "center"
+                  }}>
+                    {Number(p.valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                  </div>
+                </div>
               ))}
-            </ul>
-            <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
+            </div>
+
+            {/* Botões de Ação */}
+            <div style={{ display: "flex", gap: 10, marginTop: "auto", flexShrink: 0 }}>
               <button onClick={voltar} style={{
                 flex: 1,
-                padding: "10px 0",
-                background: "#6c757d",
+                padding: "12px 0",
+                background: "rgba(255,255,255,0.2)",
                 color: "#fff",
-                borderRadius: 8,
-                border: "none",
+                borderRadius: "10px",
+                border: "1px solid rgba(255,255,255,0.3)",
                 fontWeight: "bold",
-                cursor: "pointer"
-              }}>Voltar</button>
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+                fontSize: "1rem"
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "rgba(255,255,255,0.3)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "rgba(255,255,255,0.2)";
+              }}
+              >
+                Voltar
+              </button>
               <button onClick={() => window.print()} style={{
                 flex: 1,
-                padding: "10px 0",
-                background: "#28a745",
+                padding: "12px 0",
+                background: "linear-gradient(135deg, #28a745 0%, #20c997 100%)",
                 color: "#fff",
-                borderRadius: 8,
+                borderRadius: "10px",
                 border: "none",
                 fontWeight: "bold",
-                cursor: "pointer"
-              }}>Imprimir</button>
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+                fontSize: "1rem",
+                boxShadow: "0 2px 8px rgba(40,167,69,0.3)"
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-2px)";
+                e.currentTarget.style.boxShadow = "0 4px 12px rgba(40,167,69,0.4)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "0 2px 8px rgba(40,167,69,0.3)";
+              }}
+              >
+                Imprimir
+              </button>
             </div>
           </div>
         )}

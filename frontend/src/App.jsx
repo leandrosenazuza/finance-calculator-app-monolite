@@ -20,8 +20,9 @@ function App() {
   }, []);
 
   return (
-    <Router>
-      <Routes>
+    <div style={{ width: "100%", height: "100vh", overflow: "hidden" }}>
+      <Router>
+        <Routes>
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<Login setUser={setUser} />} />
 
@@ -36,8 +37,9 @@ function App() {
 
         {/* Redirecionamento padrão */}
         <Route path="*" element={<Navigate to="/login" />} />
-      </Routes>
-    </Router>
+        </Routes>
+      </Router>
+    </div>
   );
 }
 
