@@ -33,3 +33,6 @@ frontend/node_modules/.vite/
 # Build artifacts
 backend/node_modules/sqlite3/build/
 
+# Frontend build
+frontend/dist/
+
