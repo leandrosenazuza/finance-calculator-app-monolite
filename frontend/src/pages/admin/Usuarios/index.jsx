@@ -12,9 +12,6 @@ export default function GerenciarUsuarios() {
   const [mensagem, setMensagem] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [usuarioEditando, setUsuarioEditando] = useState(null);
-  const [editNome, setEditNome] = useState("");
-  const [editSenha, setEditSenha] = useState("");
-  const [editType, setEditType] = useState("comum");
   const [editTabela, setEditTabela] = useState("");
 
   useEffect(() => {
@@ -77,50 +74,33 @@ export default function GerenciarUsuarios() {
 
   const iniciarEdicao = (usuario) => {
     setUsuarioEditando(usuario);
-    setEditNome(usuario.name);
-    setEditSenha("");
-    setEditType(usuario.type);
     setEditTabela(usuario.tabela || "");
     setShowForm(false);
   };
 
   const cancelarEdicao = () => {
     setUsuarioEditando(null);
-    setEditNome("");
-    setEditSenha("");
-    setEditType("comum");
     setEditTabela("");
   };
 
   const handleAtualizar = async () => {
-    if (!editNome || !editType || !editTabela) {
-      setMensagem("⚠️ Preencha todos os campos obrigatórios.");
+    if (!editTabela) {
+      setMensagem("⚠️ Selecione uma tabela.");
       setTimeout(() => setMensagem(""), 3000);
       return;
     }
     
-    const login = gerarLogin(editNome);
     try {
-      const dadosAtualizacao = {
-        name: editNome,
-        username: login,
-        type: editType,
+      await axios.put(`/api/users/${usuarioEditando.id}`, {
         tabela: editTabela
-      };
-      
-      // Só inclui senha se foi preenchida
-      if (editSenha) {
-        dadosAtualizacao.password = editSenha;
-      }
-      
-      await axios.put(`/api/users/${usuarioEditando.id}`, dadosAtualizacao);
-      setMensagem("✅ Usuário atualizado com sucesso!");
+      });
+      setMensagem("✅ Tabela atualizada com sucesso!");
       cancelarEdicao();
       buscarUsuarios();
       setTimeout(() => setMensagem(""), 3000);
     } catch (err) {
-      console.error("Erro ao atualizar usuário:", err);
-      setMensagem("❌ Erro ao atualizar usuário.");
+      console.error("Erro ao atualizar tabela:", err);
+      setMensagem("❌ Erro ao atualizar tabela.");
       setTimeout(() => setMensagem(""), 3000);
     }
   };
@@ -423,14 +403,23 @@ export default function GerenciarUsuarios() {
               alignItems: "center",
               marginBottom: 24
             }}>
-              <h2 style={{
-                fontSize: "20px",
-                fontWeight: "600",
-                margin: 0,
-                color: "#1e293b"
-              }}>
-                Editar Usuário: {usuarioEditando.name}
-              </h2>
+              <div>
+                <h2 style={{
+                  fontSize: "20px",
+                  fontWeight: "600",
+                  margin: "0 0 4px 0",
+                  color: "#1e293b"
+                }}>
+                  Alterar Tabela do Usuário
+                </h2>
+                <p style={{
+                  fontSize: "14px",
+                  color: "#64748b",
+                  margin: 0
+                }}>
+                  {usuarioEditando.name} ({usuarioEditando.username})
+                </p>
+              </div>
               <button
                 onClick={cancelarEdicao}
                 style={{
@@ -456,7 +445,7 @@ export default function GerenciarUsuarios() {
             </div>
             <div style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
               gap: 20
             }}>
               <div>
@@ -467,27 +456,19 @@ export default function GerenciarUsuarios() {
                   fontWeight: "600",
                   color: "#475569"
                 }}>
-                  Nome Completo
+                  Tabela Atual
                 </label>
                 <input
-                  placeholder="Digite o nome completo"
-                  value={editNome}
-                  onChange={(e) => setEditNome(e.target.value)}
+                  value={usuarioEditando.tabela || "Nenhuma tabela atribuída"}
+                  disabled
                   style={{
                     width: "100%",
                     padding: "12px 16px",
                     borderRadius: "10px",
                     border: "1px solid #e2e8f0",
                     fontSize: "15px",
-                    transition: "all 0.2s ease"
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = "#667eea";
-                    e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102,126,234,0.1)";
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = "#e2e8f0";
-                    e.currentTarget.style.boxShadow = "none";
+                    background: "#f8fafc",
+                    color: "#64748b"
                   }}
                 />
               </div>
@@ -499,76 +480,7 @@ export default function GerenciarUsuarios() {
                   fontWeight: "600",
                   color: "#475569"
                 }}>
-                  Nova Senha (opcional)
-                </label>
-                <input
-                  placeholder="Deixe em branco para manter a senha atual"
-                  type="password"
-                  value={editSenha}
-                  onChange={(e) => setEditSenha(e.target.value)}
-                  style={{
-                    width: "100%",
-                    padding: "12px 16px",
-                    borderRadius: "10px",
-                    border: "1px solid #e2e8f0",
-                    fontSize: "15px",
-                    transition: "all 0.2s ease"
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = "#667eea";
-                    e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102,126,234,0.1)";
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = "#e2e8f0";
-                    e.currentTarget.style.boxShadow = "none";
-                  }}
-                />
-              </div>
-              <div>
-                <label style={{
-                  display: "block",
-                  marginBottom: 8,
-                  fontSize: "14px",
-                  fontWeight: "600",
-                  color: "#475569"
-                }}>
-                  Tipo de Usuário
-                </label>
-                <select
-                  value={editType}
-                  onChange={(e) => setEditType(e.target.value)}
-                  style={{
-                    width: "100%",
-                    padding: "12px 16px",
-                    borderRadius: "10px",
-                    border: "1px solid #e2e8f0",
-                    fontSize: "15px",
-                    background: "#fff",
-                    cursor: "pointer",
-                    transition: "all 0.2s ease"
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = "#667eea";
-                    e.currentTarget.style.boxShadow = "0 0 0 3px rgba(102,126,234,0.1)";
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = "#e2e8f0";
-                    e.currentTarget.style.boxShadow = "none";
-                  }}
-                >
-                  <option value="comum">Usuário Comum</option>
-                  <option value="admin">Administrador</option>
-                </select>
-              </div>
-              <div>
-                <label style={{
-                  display: "block",
-                  marginBottom: 8,
-                  fontSize: "14px",
-                  fontWeight: "600",
-                  color: "#475569"
-                }}>
-                  Tabela
+                  Nova Tabela
                 </label>
                 <select
                   value={editTabela}
@@ -623,7 +535,7 @@ export default function GerenciarUsuarios() {
                 e.currentTarget.style.boxShadow = "0 4px 12px rgba(16,185,129,0.3)";
               }}
             >
-              💾 Salvar Alterações
+              💾 Atualizar Tabela
             </button>
           </div>
         )}
