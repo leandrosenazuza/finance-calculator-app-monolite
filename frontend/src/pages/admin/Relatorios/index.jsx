@@ -80,7 +80,7 @@ export default function Relatorios() {
     }}>
       <Sidebar />
 
-      <div style={{ flex: 1, padding: "40px", overflowY: "auto" }}>
+      <div style={{ flex: 1, padding: "40px", overflowY: "auto", marginLeft: "280px" }}>
         <div style={{ marginBottom: 32 }}>
           <h1 style={{
             fontSize: "32px",

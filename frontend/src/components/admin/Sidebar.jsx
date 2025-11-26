@@ -28,7 +28,11 @@ export default function Sidebar() {
       flexDirection: "column",
       justifyContent: "space-between",
       boxShadow: "4px 0 20px rgba(0,0,0,0.1)",
-      minHeight: "100vh"
+      height: "100vh",
+      position: "fixed",
+      left: 0,
+      top: 0,
+      overflowY: "auto"
     }}>
       <div>
         <div style={{
@@ -115,7 +119,7 @@ export default function Sidebar() {
           window.location.href = "/login";
         }}
         style={{
-          marginTop: 30,
+          marginTop: "auto",
           padding: "14px 18px",
           backgroundColor: "rgba(255,77,79,0.9)",
           color: "#fff",
@@ -129,7 +133,8 @@ export default function Sidebar() {
           justifyContent: "center",
           gap: 8,
           transition: "all 0.3s ease",
-          boxShadow: "0 4px 12px rgba(255,77,79,0.3)"
+          boxShadow: "0 4px 12px rgba(255,77,79,0.3)",
+          flexShrink: 0
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.backgroundColor = "rgba(255,77,79,1)";

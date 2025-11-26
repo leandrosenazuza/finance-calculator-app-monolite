@@ -78,7 +78,8 @@ export default function Dashboard() {
       <div style={{
         flex: 1,
         padding: "40px",
-        overflowY: "auto"
+        overflowY: "auto",
+        marginLeft: "280px"
       }}>
         <div style={{ marginBottom: 40 }}>
           <h1 style={{

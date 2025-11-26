@@ -90,7 +90,7 @@ export default function GerenciarUsuarios() {
     }}>
       <Sidebar />
 
-      <div style={{ flex: 1, padding: "40px", overflowY: "auto" }}>
+      <div style={{ flex: 1, padding: "40px", overflowY: "auto", marginLeft: "280px" }}>
         <div style={{
           display: "flex",
           justifyContent: "space-between",
