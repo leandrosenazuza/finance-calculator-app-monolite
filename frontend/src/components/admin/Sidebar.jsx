@@ -120,6 +120,7 @@ export default function Sidebar() {
         }}
         style={{
           marginTop: "auto",
+          marginBottom: "20px",
           padding: "14px 18px",
           backgroundColor: "rgba(255,77,79,0.9)",
           color: "#fff",
